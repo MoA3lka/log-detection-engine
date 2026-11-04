@@ -1,0 +1,15 @@
+Dec 10 10:00:01 testhost sshd[1001]: Failed password for invalid user admin from 203.0.113.45 port 50001 ssh2
+Dec 10 10:00:05 testhost sshd[1001]: Failed password for invalid user admin from 203.0.113.45 port 50002 ssh2
+Dec 10 10:00:09 testhost sshd[1001]: Failed password for root from 203.0.113.45 port 50003 ssh2
+Dec 10 10:00:14 testhost sshd[1001]: Failed password for root from 203.0.113.45 port 50004 ssh2
+Dec 10 10:00:20 testhost sshd[1001]: Failed password for root from 203.0.113.45 port 50005 ssh2
+Dec 10 10:00:26 testhost sshd[1001]: Failed password for root from 203.0.113.45 port 50006 ssh2
+Dec 10 10:05:00 testhost sshd[1002]: Failed password for root from 198.51.100.7 port 51001 ssh2
+Dec 10 10:05:30 testhost sshd[1002]: Failed password for root from 198.51.100.7 port 51002 ssh2
+Dec 10 10:06:00 testhost sshd[1002]: Failed password for root from 198.51.100.7 port 51003 ssh2
+Dec 10 10:06:30 testhost sshd[1002]: Failed password for root from 198.51.100.7 port 51004 ssh2
+Dec 10 10:07:00 testhost sshd[1002]: Failed password for root from 198.51.100.7 port 51005 ssh2
+Dec 10 10:07:30 testhost sshd[1002]: Failed password for root from 198.51.100.7 port 51006 ssh2
+Dec 10 10:10:00 testhost sshd[1003]: Failed password for alice from 198.51.100.20 port 52001 ssh2
+Dec 10 10:10:08 testhost sshd[1003]: Failed password for alice from 198.51.100.20 port 52002 ssh2
+Dec 10 10:10:15 testhost sshd[1003]: Accepted password for alice from 198.51.100.20 port 52003 ssh2
