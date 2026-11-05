@@ -10,7 +10,7 @@ activity using detection rules mapped to MITRE ATT&CK.
 - [x] Parser: turns raw SSH log lines into structured events (timestamp, host, process, event, user, IP)
 - [x] Rule 1: SSH brute force (more than 5 failed logins from one IP within 60 seconds), MITRE T1110.001
 - [x] Rule 2: successful login after repeated failures
-- [ ] Rule 3: privileged (sudo) activity
+- [x] Rule 3: privileged (sudo) activity
 - [ ] JSON alert output with severity
 - [ ] Rules defined in YAML
 - [ ] Tests (pytest) and CI (GitHub Actions)
