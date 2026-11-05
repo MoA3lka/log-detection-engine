@@ -35,11 +35,11 @@ def parse_line(line):
 
     match = ACCEPTED.search(message)
     if match:
-        event["event"] = "accpeted_password"
+        event["event"] = "accepted_password"
         event["user"] = match.group(1)
         event["ip"] = match.group(2)
         return event
-
+    
     match = INVALID.search(message)
     if match:
         event["event"] = "invalid_user"

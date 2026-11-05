@@ -8,6 +8,10 @@ from detector.parser import parse_file
 BRUTE_FORCE_THRESHOLD = 5
 BRUTE_FORCE_WINDOW_SECONDS = 60
 
+# Rule 2 settings: a successful login after at least 3 failures from the same IP in the previous 10minutes
+LOGIN_AFTER_FAILURES_MIN_FAILURES = 3
+LOGIN_AFTER_FAILURES_LOOKBACK_SECONDS = 600
+
 def to_datetime(timestamp):
     """Convert 'Dec 10 06:55:48' into a datetime so we can do time maths."""
     #Syslog timestamps have no year, so we add one to keep Python within 60 Seconds
@@ -49,10 +53,47 @@ def detect_brute_force(events):
 
     return alerts
 
-# Quick manual check run wiht 'python -m detector.rules'
+def detect_login_after_failures(events):
+    """Rule 2: flag a sucessful login from an IP that just failed several Times."""
+
+    # Rememebr When each IP failed, so we can look back from each successful login
+    failures = defaultdict(list)
+    alerts = []
+
+    for event in events:
+        if event["event"] == "failed_password":
+            failures[event["ip"]].append(to_datetime(event["timestamp"]))
+
+        elif event["event"] == "accepted_password":
+            login_time = to_datetime(event["timestamp"])
+
+            #count this IP's failures within the lookback window before the login
+            recent_failures = 0 # starts the tally at zero
+            for failure_time in failures[event["ip"]]: #goes through each failure time for this IP only
+                seconds_before = (login_time - failure_time).total_seconds() # asks how long before the login the failure happened
+                if 0 <= seconds_before <= LOGIN_AFTER_FAILURES_LOOKBACK_SECONDS: #checks the failure was before the login the failure happend
+                    recent_failures += 1 
+
+            if recent_failures >= LOGIN_AFTER_FAILURES_MIN_FAILURES:
+                alerts.append({
+                    "rule": "ssh_login_after_failures",
+                    "severity" : "critical",
+                    "mitre_technique" : "T1110.001",
+                    "ip" : event["ip"],
+                    "user" : event["user"],
+                    "failed_attempts_before_login" : recent_failures,
+                    "login_time" : event["timestamp"],
+                })
+    return alerts
+
 if __name__ == "__main__":
     for path in ["samples/generated_attack.log", "samples/OpenSSH_2k.log"]:
-        alerts = detect_brute_force(parse_file(path))
-        print(f"\n{path}: {len(alerts)} brute-force alert(s)")
-        for alert in alerts:
-            print(alert)
+        events = parse_file(path)
+        print(f"\n{path}")
+        print(f"Rule 1 (brute force): {len(detect_brute_force(events))} alert(s)")
+
+        rule2_alerts = detect_login_after_failures(events)
+        print(f" Rule 2 (login after failures): {len(rule2_alerts)} alert(s)")
+
+        for alert in rule2_alerts:
+            print("  ", alert)

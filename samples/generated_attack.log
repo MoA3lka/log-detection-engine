@@ -13,3 +13,4 @@ Dec 10 10:07:30 testhost sshd[1002]: Failed password for root from 198.51.100.7 
 Dec 10 10:10:00 testhost sshd[1003]: Failed password for alice from 198.51.100.20 port 52001 ssh2
 Dec 10 10:10:08 testhost sshd[1003]: Failed password for alice from 198.51.100.20 port 52002 ssh2
 Dec 10 10:10:15 testhost sshd[1003]: Accepted password for alice from 198.51.100.20 port 52003 ssh2
+Dec 10 10:00:40 testhost sshd[1004]: Accepted password for root from 203.0.113.45 port 50010 ssh2
