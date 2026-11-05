@@ -1,5 +1,5 @@
 """"Detection rules that turn parsed events into alerts."""
-
+import json
 from collections import defaultdict
 from datetime import datetime
 
@@ -112,19 +112,23 @@ def detect_sudo_activity(events):
         })
     return alerts
 
+
+def run_all_rules(events):
+    """Run every detection rule and return all alerts in one lists."""
+    return(
+        detect_brute_force(events)
+        + detect_login_after_failures(events)
+        + detect_sudo_activity(events)
+    )
+
 if __name__ == "__main__":
-    for path in ["samples/generated_attack.log", "samples/OpenSSH_2k.log"]:
-        events = parse_file(path)
-        print(f"\n{path}")
-        print(f"Rule 1 (brute force): {len(detect_brute_force(events))} alert(s)")
+    events = parse_file("samples/generated_attack.log")
+    alerts = run_all_rules(events)
 
-        rule2_alerts = detect_login_after_failures(events)
-        print(f" Rule 2 (login after failures): {len(rule2_alerts)} alert(s)")
+    # save alerts as JSON so other tools (or people) can read them
+    with open("alerts.json", "w") as f:
+        json.dump(alerts, f, indent=2)
 
-        for alert in rule2_alerts:
-            print("  ", alert)
-
-        rule3_alerts = detect_sudo_activity(events)
-        print(f"Rule 3 (sudo activity): {len(rule3_alerts)} alert(s)")
-        for alert in rule3_alerts:
-            print("   ",alert)
+    print(f"{len(alerts)} alert(s) written to alerts.json")
+    for alert in alerts:
+        print(f"[{alert['severity'].upper()}] {alert['rule']}")

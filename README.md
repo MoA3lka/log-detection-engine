@@ -11,7 +11,7 @@ activity using detection rules mapped to MITRE ATT&CK.
 - [x] Rule 1: SSH brute force (more than 5 failed logins from one IP within 60 seconds), MITRE T1110.001
 - [x] Rule 2: successful login after repeated failures
 - [x] Rule 3: privileged (sudo) activity
-- [ ] JSON alert output with severity
+- [x] JSON alert output with severity
 - [ ] Rules defined in YAML
 - [ ] Tests (pytest) and CI (GitHub Actions)
 - [ ] Docker packaging
@@ -22,6 +22,8 @@ Requires Python 3.10+. Run from the project root:
 ```bash
 python -m detector.rules
 ```
+
+Alerts are written to `alerts.json`.
 
 ## Results so far
 Run against 2,000 real SSH log lines from the LogHub dataset:

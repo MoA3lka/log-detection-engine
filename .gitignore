@@ -221,3 +221,6 @@ __marimo__/
 
 # Allow sample logs used for testing
 !samples/*.log
+
+# Generated alert output
+alerts.json
