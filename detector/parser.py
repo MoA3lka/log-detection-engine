@@ -1,11 +1,12 @@
 import re  # regex tools for finding patterns in text
 from collections import Counter # counts how many times each thing appears
 
-# Regex patterns for the ssh events we care about
+# Regex patterns for the events we care about
 # Complied once at load time and reused for every line.
 FAILED = re.compile(r"Failed password for (invalid user )?(\S+) from (\S+)") # failed password
 ACCEPTED = re.compile(r"Accepted password for (\S+) from (\S+)") # accepted password
 INVALID = re.compile(r"Invalid user (\S+) from (\S+)") # invalid users
+SUDO = re.compile(r"^\s*(\S+) : .*USER=(\S+) ; COMMAND=(.+)$")
 
 
 def parse_line(line): 
@@ -24,6 +25,16 @@ def parse_line(line):
         "host": parts[3],
         "process": parts[4].split("[")[0],
     }
+#sudo line have theri own format, so check them first
+    if event["process"] == "sudo":
+        match = SUDO.search(message)
+        if match:
+            event["event"] = "sudo_command"
+            event["user"] = match.group(1)
+            event["run_as"] = match.group(2)
+            event["command"] = match.group(3)
+            return event
+        return None
 
     # Match the message against each event type; first match witns
     match = FAILED.search(message)
@@ -73,3 +84,4 @@ if __name__ == "__main__":
 
     failed_ips = Counter(e["ip"] for e in events if e["event"] == "failed_password")
     print("Top 5 attacking IPs:", failed_ips.most_common(5))
+

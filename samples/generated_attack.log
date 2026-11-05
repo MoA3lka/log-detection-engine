@@ -14,3 +14,6 @@ Dec 10 10:10:00 testhost sshd[1003]: Failed password for alice from 198.51.100.2
 Dec 10 10:10:08 testhost sshd[1003]: Failed password for alice from 198.51.100.20 port 52002 ssh2
 Dec 10 10:10:15 testhost sshd[1003]: Accepted password for alice from 198.51.100.20 port 52003 ssh2
 Dec 10 10:00:40 testhost sshd[1004]: Accepted password for root from 203.0.113.45 port 50010 ssh2
+Dec 10 10:01:10 testhost sudo:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/bin/cat /etc/shadow
+Dec 10 10:01:30 testhost sudo:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/usr/sbin/useradd backdoor
+Dec 10 10:12:00 testhost sudo:    alice : TTY=pts/1 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/apt update This line is malformed and should be skipped

@@ -12,6 +12,10 @@ BRUTE_FORCE_WINDOW_SECONDS = 60
 LOGIN_AFTER_FAILURES_MIN_FAILURES = 3
 LOGIN_AFTER_FAILURES_LOOKBACK_SECONDS = 600
 
+#Rule 3 settings: sudo commands that touch these are treated as hihg severity
+SENSITIVE_COMMAND_KEYWORDS = ["/etc/shadow", "etc/sudoers", "etc/passwd", "useradd", "usermod", "passwd", "visudo"]
+
+
 def to_datetime(timestamp):
     """Convert 'Dec 10 06:55:48' into a datetime so we can do time maths."""
     #Syslog timestamps have no year, so we add one to keep Python within 60 Seconds
@@ -86,6 +90,28 @@ def detect_login_after_failures(events):
                 })
     return alerts
 
+#sudo 
+def detect_sudo_activity(events):
+    """Rule 3: flag sudo commands, with higher severity for sensitive ones."""
+
+    alerts = []
+    for event in events:
+        if event["event"] != "sudo_command":
+            continue
+        #Sensitive commands (reading password hashes, creating users...) are high severity
+        is_sensitive = any(keyword in event["command"] for keyword in SENSITIVE_COMMAND_KEYWORDS)
+
+        alerts.append({
+            "rule": "sudo_activity",
+            "severity": "high" if is_sensitive else "low",
+            "mitre_technique": "T1548.003",
+            "user": event["user"],
+            "run_as": event["run_as"],
+            "command": event["command"],
+            "time": event["timestamp"],
+        })
+    return alerts
+
 if __name__ == "__main__":
     for path in ["samples/generated_attack.log", "samples/OpenSSH_2k.log"]:
         events = parse_file(path)
@@ -97,3 +123,8 @@ if __name__ == "__main__":
 
         for alert in rule2_alerts:
             print("  ", alert)
+
+        rule3_alerts = detect_sudo_activity(events)
+        print(f"Rule 3 (sudo activity): {len(rule3_alerts)} alert(s)")
+        for alert in rule3_alerts:
+            print("   ",alert)
