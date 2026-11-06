@@ -1,6 +1,8 @@
 import re  # regex tools for finding patterns in text
 from collections import Counter # counts how many times each thing appears
 
+from datetime import datetime
+
 # Regex patterns for the events we care about
 # Complied once at load time and reused for every line.
 FAILED = re.compile(r"Failed password for (invalid user )?(\S+) from (\S+)") # failed password
@@ -19,12 +21,21 @@ def parse_line(line):
     parts = header.split()
     if len(parts) < 5:
         return None
+
+    #Skip lines whose timestamp isn't a real date (e.g. "Dec 99 10:00:00")
+    timestamp = " ".join(parts[0:3])
+    try:
+        datetime.strptime("2026 " + timestamp, "%Y %b %d %H:%M:%S")
+    except ValueError:
+        return None
+    
     # Header fields: timestamp, host, and process name (without the PID)
     event = {
-        "timestamp": " ".join(parts[0:3]),
+        "timestamp": timestamp,
         "host": parts[3],
         "process": parts[4].split("[")[0],
-    }
+    } 
+
 #sudo line have theri own format, so check them first
     if event["process"] == "sudo":
         match = SUDO.search(message)
@@ -63,7 +74,7 @@ def parse_line(line):
 def parse_file(path):
     #read a whole log file and return a list of parsed events.
     events = []
-    with open(path) as f:
+    with open(path, encoding="utf-8", errors="replace") as f:
         for line in f:
             event = parse_line(line)
             if event is not None:

@@ -1,0 +1,7 @@
+
+Garbage: line
+Dec 10 sshd: Failed password for root from 203.0.113.50 port 1 ssh2
+Dec 10 10:15:00 testhost sshd[1005]:
+Dec 99 10:15:00 testhost sshd[1006]: Failed password for root from 203.0.113.51 port 2 ssh2
+Dec 10 25:61:00 testhost sshd[1007]: Failed password for root from 203.0.113.52 port 3 ssh2
+Dec 10 10:15:05 testhost sshd[1008]: Failed password for root from 203.0.113.53 port 4 ssh2

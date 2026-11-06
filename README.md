@@ -12,6 +12,7 @@ activity using detection rules mapped to MITRE ATT&CK.
 - [x] Rule 2: successful login after repeated failures
 - [x] Rule 3: privileged (sudo) activity
 - [x] JSON alert output with severity
+- [x] Robust parsing: skips malformed lines, impossible timestamps and invalid characters without crashing
 - [ ] Rules defined in YAML
 - [ ] Tests (pytest) and CI (GitHub Actions)
 - [ ] Docker packaging
@@ -40,7 +41,8 @@ samples/
   OpenSSH_2k.log          # real SSH logs (LogHub)
   generated_attack.log    # small test log with a known expected result
 ```
-
+  malformed.log           # deliberately broken lines to test robust parsing
+  
 ## Data
 - `OpenSSH_2k.log` comes from [LogHub](https://github.com/logpai/loghub) (logpai/loghub).
 - `generated_attack.log` is synthetic test data using documentation IP ranges
