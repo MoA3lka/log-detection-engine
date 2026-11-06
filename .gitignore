@@ -224,3 +224,4 @@ __marimo__/
 
 # Generated alert output
 *alerts.json
+results/

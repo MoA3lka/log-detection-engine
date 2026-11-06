@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+from pathlib import Path
 
 
 from detector.parser import parse_file
@@ -27,6 +28,9 @@ def main():
 
     alerts = run_all_rules(events)
 
+    # Make sure the output folder exists (e.g. results/ in results/alerts.json)
+    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+    
     # Save alerts as JSON so other tools (or people) can read them
     with open(args.output, "w") as f:
         json.dump(alerts, f, indent=2)
