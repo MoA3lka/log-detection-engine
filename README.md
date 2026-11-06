@@ -21,10 +21,17 @@ activity using detection rules mapped to MITRE ATT&CK.
 Requires Python 3.10+. Run from the project root:
 
 ```bash
-python -m detector.rules
+python -m detector --input samples/generated_attack.log
 ```
 
-Alerts are written to `alerts.json`.
+Options:
+
+| Option | Description |
+|---|---|
+| `--input` | Path to the log file to analyse (required) |
+| `--output` | Where to save alerts (default: `alerts.json`) |
+
+Run `python -m detector --help` for details.
 
 ## Results so far
 Run against 2,000 real SSH log lines from the LogHub dataset:
