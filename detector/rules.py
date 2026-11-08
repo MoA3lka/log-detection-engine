@@ -2,20 +2,25 @@
 import json
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
+
+
+import yaml
 
 from detector.parser import parse_file
 
-BRUTE_FORCE_THRESHOLD = 5
-BRUTE_FORCE_WINDOW_SECONDS = 60
 
-# Rule 2 settings: a successful login after at least 3 failures from the same IP in the previous 10minutes
-LOGIN_AFTER_FAILURES_MIN_FAILURES = 3
-LOGIN_AFTER_FAILURES_LOOKBACK_SECONDS = 600
-
-#Rule 3 settings: sudo commands that touch these are treated as hihg severity
-SENSITIVE_COMMAND_KEYWORDS = ["/etc/shadow", "etc/sudoers", "etc/passwd", "useradd", "usermod", "passwd", "visudo"]
+# Rule file live in the rules/ folder at the project root
+RULES_DIR = Path(__file__).resolve().parent.parent / "rules"
 
 
+def load_rule(rule_id):
+    """Load one rule's YAML file, e.g. rules/ssh_brute_force.yml."""
+    with open(RULES_DIR / f"{rule_id}.yml", encoding="utf-8") as f:
+        # safe_load only reads plain data and never runs code from teh file
+
+        return yaml.safe_load(f)
+    
 def to_datetime(timestamp):
     """Convert 'Dec 10 06:55:48' into a datetime so we can do time maths."""
     #Syslog timestamps have no year, so we add one to keep Python within 60 Seconds
@@ -23,6 +28,10 @@ def to_datetime(timestamp):
 
 def detect_brute_force(events):
     """Rule 1: flag IPs with too many failed logins in a short time window."""
+
+    rule = load_rule("ssh_brute_force")
+    threshold = rule["settings"]["threshold"]
+    window_seconds = rule["settings"]["window_seconds"]
 
     #Group the time of failed logins by source IP
     failures = defaultdict(list)
@@ -37,16 +46,17 @@ def detect_brute_force(events):
         times.sort()
         start = 0
         for end in range(len(times)):
+
             #shrink the window from the left until it spans 60 seconds or less
-            while(times[end] - times[start]).total_seconds() > BRUTE_FORCE_WINDOW_SECONDS:
+            while (times[end] - times[start]).total_seconds() > window_seconds:
                 start += 1
 
             attempts_in_window = end - start + 1
-            if attempts_in_window > BRUTE_FORCE_THRESHOLD:
+            if attempts_in_window > threshold:
                 alerts.append({
-                    "rule": "ssh_brute_force",
-                    "severity": "high",
-                    "mitre_technique": "T1110.001",
+                    "rule": rule["id"],
+                    "severity": rule["severity"],
+                    "mitre_technique": rule["mitre_technique"],
                     "ip": ip,
                     "attempts_in_window": attempts_in_window,
                     "total_failed_attempts": len(times),
@@ -59,6 +69,9 @@ def detect_brute_force(events):
 
 def detect_login_after_failures(events):
     """Rule 2: flag a sucessful login from an IP that just failed several Times."""
+    rule = load_rule("ssh_login_after_failures")
+    min_failures = rule["settings"]["min_failures"]
+    lookback_seconds = rule["settings"]["lookback_seconds"]
 
     # Rememebr When each IP failed, so we can look back from each successful login
     failures = defaultdict(list)
@@ -75,14 +88,14 @@ def detect_login_after_failures(events):
             recent_failures = 0 # starts the tally at zero
             for failure_time in failures[event["ip"]]: #goes through each failure time for this IP only
                 seconds_before = (login_time - failure_time).total_seconds() # asks how long before the login the failure happened
-                if 0 <= seconds_before <= LOGIN_AFTER_FAILURES_LOOKBACK_SECONDS: #checks the failure was before the login the failure happend
+                if 0 <= seconds_before <= lookback_seconds: #checks the failure was before the login the failure happend
                     recent_failures += 1 
 
-            if recent_failures >= LOGIN_AFTER_FAILURES_MIN_FAILURES:
+            if recent_failures >= min_failures:
                 alerts.append({
-                    "rule": "ssh_login_after_failures",
-                    "severity" : "critical",
-                    "mitre_technique" : "T1110.001",
+                    "rule": rule["id"],
+                    "severity" : rule["severity"],
+                    "mitre_technique" : rule["mitre_technique"],
                     "ip" : event["ip"],
                     "user" : event["user"],
                     "failed_attempts_before_login" : recent_failures,
@@ -94,17 +107,20 @@ def detect_login_after_failures(events):
 def detect_sudo_activity(events):
     """Rule 3: flag sudo commands, with higher severity for sensitive ones."""
 
+    rule= load_rule("sudo_activity")
+    keywords = rule["settings"]["sensitive_keywords"]
+
     alerts = []
     for event in events:
         if event["event"] != "sudo_command":
             continue
         #Sensitive commands (reading password hashes, creating users...) are high severity
-        is_sensitive = any(keyword in event["command"] for keyword in SENSITIVE_COMMAND_KEYWORDS)
+        is_sensitive = any(keyword in event["command"] for keyword in keywords)
 
         alerts.append({
-            "rule": "sudo_activity",
-            "severity": "high" if is_sensitive else "low",
-            "mitre_technique": "T1548.003",
+            "rule": rule["id"],
+            "severity": rule["settings"]["sensitive_severity"] if is_sensitive else rule["severity"],
+            "mitre_technique": rule["mitre_technique"],
             "user": event["user"],
             "run_as": event["run_as"],
             "command": event["command"],

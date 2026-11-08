@@ -13,15 +13,17 @@ activity using detection rules mapped to MITRE ATT&CK.
 - [x] Rule 3: privileged (sudo) activity
 - [x] JSON alert output with severity
 - [x] Robust parsing: skips malformed lines, impossible timestamps and invalid characters without crashing
-- [ ] Rules defined in YAML
+- [x] Rules defined in YAML
 - [ ] Tests (pytest) and CI (GitHub Actions)
 - [ ] Docker packaging
 
 ## Quick start
 Requires Python 3.10+. Run from the project root:
 
+Install dependencies:
+
 ```bash
-python -m detector --input samples/generated_attack.log
+python -m pip install -r requirements.txt
 ```
 
 Options:

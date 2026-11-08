@@ -1,0 +1,8 @@
+id: ssh_login_after_failures
+title: SSH login after repeated failures
+description: A successful SSH login from an IP that recently failed several times.
+severity: critical
+mitre_technique: T1110.001
+settings:
+  min_failures: 3
+  lookback_seconds: 300

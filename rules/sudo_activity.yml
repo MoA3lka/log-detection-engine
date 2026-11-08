@@ -1,0 +1,15 @@
+id: sudo_activity
+title: Sudo activity
+description: Commands run with sudo; sensitive commands get a higher severity.
+severity: low
+mitre_technique: T1548.003
+settings:
+  sensitive_severity: high
+  sensitive_keywords:
+    - /etc/shadow
+    - /etc/sudores
+    - /etc/passwd
+    - useradd
+    - usermod
+    - passwd
+    - visudo

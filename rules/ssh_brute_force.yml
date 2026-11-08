@@ -1,0 +1,8 @@
+id: ssh_brute_force
+title: SSH brtue force
+description: Many failed SSH logins from one IP address in a short time.
+severity: high
+mitre_technique: T1110.001
+settings:
+  threshold: 5 # alert when failures in the window are MORE than this
+  window_seconds: 60
