@@ -1,4 +1,5 @@
 # Log Detection Engine
+![CI](https://github.com/MoA3lka/log-detection-engine/actions/workflows/ci.yml/badge.svg)
 
 A Python tool that parses Linux authentication logs and flags suspicious
 activity using detection rules mapped to MITRE ATT&CK.
@@ -16,7 +17,7 @@ activity using detection rules mapped to MITRE ATT&CK.
 - [x] Robust parsing: skips malformed lines, impossible timestamps and invalid characters without crashing
 - [x] Command-line interface
 - [x] 18 automated tests (pytest)
-- [ ] CI (GitHub Actions)
+- [x] CI (GitHub Actions)
 - [ ] Docker packaging
 
 ## Quick start
