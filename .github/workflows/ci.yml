@@ -31,3 +31,11 @@ jobs:
       
       - name: Run tests
         run: python -m pytest -v
+
+      - name: Build Docker image
+        run: docker build -t log-detection-engine .
+
+      - name: Run the container on the sample attack log
+        run: docker run --rm "$PWD/samples:/data:ro" log-detection-engine --input /data/generated_attack.log --output /tmp/alerts.json
+
+        

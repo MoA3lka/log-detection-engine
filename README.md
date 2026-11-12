@@ -18,7 +18,7 @@ activity using detection rules mapped to MITRE ATT&CK.
 - [x] Command-line interface
 - [x] 18 automated tests (pytest)
 - [x] CI (GitHub Actions)
-- [ ] Docker packaging
+- [x] Docker packaging
 
 ## Quick start
 Requires Python 3.10+. Run from the project root.
@@ -41,6 +41,16 @@ python -m detector --input samples/generated_attack.log
 | `--output` | Where to save alerts (default: `alerts.json`) |
 
 Run `python -m detector --help` for details.
+
+## Run with Docker
+
+```bash
+docker build -t log-detection-engine .
+docker run --rm -v "$PWD/samples:/data:ro" log-detection-engine --input /data/generated_attack.log --output /tmp/alerts.json
+```
+
+The image runs as a non-root user, and logs are mounted read-only.
+
 
 ## Running tests
 
