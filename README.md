@@ -12,13 +12,16 @@ activity using detection rules mapped to MITRE ATT&CK.
 - [x] Rule 1: SSH brute force (more than 5 failed logins from one IP within 60 seconds), MITRE T1110.001
 - [x] Rule 2: successful login after repeated failures, MITRE T1110.001
 - [x] Rule 3: privileged (sudo) activity, with higher severity for sensitive commands, MITRE T1548.003
+- [x] Rule 4: password spraying (one IP trying many usernames), MITRE T1110.003
+- [x] Rule 5: new user account created, MITRE T1136.001
 - [x] Rule settings defined in YAML (thresholds, severity, MITRE IDs)
 - [x] JSON alert output with severity
 - [x] Robust parsing: skips malformed lines, impossible timestamps and invalid characters without crashing
 - [x] Command-line interface
 - [x] 18 automated tests (pytest)
 - [x] CI (GitHub Actions)
-- [x] Docker packaging
+- [x] Docker packaging: slim image, non-root user, read-only log mounts, trivy vulnerability scan in CI
+
 
 ## Quick start
 Requires Python 3.10+. Run from the project root.

@@ -1,0 +1,5 @@
+id: new_user_created
+title: New user account created
+description: A new local user account was created, a common way for attackers to keep access.
+severity: high
+mitre_technique: T1136.001

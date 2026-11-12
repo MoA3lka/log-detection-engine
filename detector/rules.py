@@ -135,6 +135,8 @@ def run_all_rules(events):
         detect_brute_force(events)
         + detect_login_after_failures(events)
         + detect_sudo_activity(events)
+        + detect_password_spraying(events)
+        +detect_new_user_created(events)
     )
 
 if __name__ == "__main__":
@@ -148,3 +150,47 @@ if __name__ == "__main__":
     print(f"{len(alerts)} alert(s) written to alerts.json")
     for alert in alerts:
         print(f"[{alert['severity'].upper()}] {alert['rule']}")
+
+
+
+def detect_password_spraying(events):
+    """Rule 4: flag IPs that try many different usernames."""
+    rule = load_rule("password_spraying")
+    min_usernames = rule["settings"]["min_usernames"]
+
+    #collect the different usernames each IP tried
+    usernames_by_ip = defaultdict(set)
+    for event in events:
+        if event["event"] in ("failed_password", "invalid_user"):
+            usernames_by_ip[event["ip"]].add(event["user"])
+
+    alerts = []
+    for ip, usernames in usernames_by_ip.items():
+        if len(usernames) >= min_usernames:
+            alerts.append({
+                "rule": rule["id"],
+                "severity": rule["severity"],
+                "mitre_technique": rule["mitre_technique"],
+                "ip": ip,
+                "usernames_tried": len(usernames),
+                "sample_usernames": sorted(usernames)[:10],
+            })
+    return alerts
+
+
+def detect_new_user_created(events):
+    """Rule 5: flag every new user account."""
+    rule = load_rule("new_user_created")
+
+    alerts = []
+    for event in events:
+        if event["event"] == "user_created":
+            alerts.append({
+                "rule": rule["id"],
+                "severity": rule["severity"],
+                "mitre_technique": rule["mitre_technique"],
+                "new_user": event["user"],
+                "time": event["timestamp"],
+                "host": event["host"],
+            })
+    return alerts

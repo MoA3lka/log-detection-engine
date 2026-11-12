@@ -9,7 +9,7 @@ FAILED = re.compile(r"Failed password for (invalid user )?(\S+) from (\S+)") # f
 ACCEPTED = re.compile(r"Accepted password for (\S+) from (\S+)") # accepted password
 INVALID = re.compile(r"Invalid user (\S+) from (\S+)") # invalid users
 SUDO = re.compile(r"^\s*(\S+) : .*USER=(\S+) ; COMMAND=(.+)$")
-
+NEW_USER = re.compile(r"new user: name=([^,]+),")
 
 def parse_line(line): 
     #turn one log into a dict, or return none if we dont care about it
@@ -47,6 +47,17 @@ def parse_line(line):
             return event
         return None
 
+    
+# useradd lines record new accounts being created
+    if event["process"] == "useradd":
+        match = NEW_USER.search(message)
+        if match:
+            event["event"] = "user_created"
+            event["user"] = match.group(1)
+            return event
+        return None
+
+    
     # Match the message against each event type; first match witns
     match = FAILED.search(message)
     if match:

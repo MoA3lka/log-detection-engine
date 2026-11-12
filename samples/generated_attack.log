@@ -17,3 +17,9 @@ Dec 10 10:00:40 testhost sshd[1004]: Accepted password for root from 203.0.113.4
 Dec 10 10:01:10 testhost sudo:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/bin/cat /etc/shadow
 Dec 10 10:01:30 testhost sudo:     root : TTY=pts/0 ; PWD=/root ; USER=root ; COMMAND=/usr/sbin/useradd backdoor
 Dec 10 10:12:00 testhost sudo:    alice : TTY=pts/1 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/apt update This line is malformed and should be skipped
+Dec 10 10:20:00 testhost sshd[1010]: Invalid user oracle from 203.0.113.77
+Dec 10 10:20:30 testhost sshd[1011]: Invalid user test from 203.0.113.77
+Dec 10 10:21:00 testhost sshd[1012]: Invalid user guest from 203.0.113.77
+Dec 10 10:21:30 testhost sshd[1013]: Invalid user ubuntu from 203.0.113.77
+Dec 10 10:22:00 testhost sshd[1014]: Invalid user postgres from 203.0.113.77
+Dec 10 10:01:31 testhost useradd[2201]: new user: name=backdoor, UID=1001, GID=1001, home=/home/backdoor, shell=/bin/bash

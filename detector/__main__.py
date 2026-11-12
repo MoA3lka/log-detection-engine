@@ -41,6 +41,7 @@ def main():
     for alert in alerts:
         print(f"[{alert['severity'].upper()}] {alert['rule']}")
 
+
 if __name__ == "__main__":
     main()
 
