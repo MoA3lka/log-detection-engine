@@ -1,4 +1,5 @@
 name: CI
+
 on:
   push:
   pull_request:
@@ -10,25 +11,21 @@ jobs:
     steps:
       - name: Get the code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      
-      - name: Install dependencises
+      - name: Install dependencies
         run: python -m pip install -r requirements-dev.txt
 
-      
       - name: Lint with ruff
         run: python -m ruff check .
-      
 
       - name: Security scan with bandit
         run: python -m bandit -r detector
 
-      
       - name: Run tests
         run: python -m pytest -v
 
@@ -36,8 +33,7 @@ jobs:
         run: docker build -t log-detection-engine .
 
       - name: Run the container on the sample attack log
-        run: docker run --rm "$PWD/samples:/data:ro" log-detection-engine --input /data/generated_attack.log --output /tmp/alerts.json
-
+        run: docker run --rm -v "$PWD/samples:/data:ro" log-detection-engine --input /data/generated_attack.log --output /tmp/alerts.json
 
       - name: Scan the image for vulnerabilities with trivy
         run: >
